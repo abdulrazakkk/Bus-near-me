@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+
+axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 import {
@@ -169,7 +171,7 @@ export default function App() {
 
   // Fetch locations from backend if available
   useEffect(() => {
-    axios.get('http://localhost:3000/api/locations')
+    axios.get('/api/locations')
       .then(res => {
         if (res.data && res.data.length > 0) {
           setLocations(res.data);
@@ -184,7 +186,7 @@ export default function App() {
     setSelectedBus(null);
     setIsLocationDropdownOpen(false);
     try {
-      const res = await axios.post('http://localhost:3000/api/location', {
+      const res = await axios.post('/api/location', {
         name: loc.name,
         lat: loc.lat,
         lng: loc.lng,
@@ -193,7 +195,7 @@ export default function App() {
         setBuses(res.data.buses);
       }
       // Fetch nearby stops
-      const stopsRes = await axios.get(`http://localhost:3000/api/stops/nearby?lat=${loc.lat}&lng=${loc.lng}`);
+      const stopsRes = await axios.get(`/api/stops/nearby?lat=${loc.lat}&lng=${loc.lng}`);
       setNearbyStops(stopsRes.data);
 
       // Generate a nice route polyline around this location
@@ -212,7 +214,7 @@ export default function App() {
 
   const fetchBuses = async () => {
     try {
-      const res = await axios.get('http://localhost:3000/api/buses');
+      const res = await axios.get('/api/buses');
       setBuses(res.data);
       setLoading(false);
     } catch (err) {
@@ -223,7 +225,7 @@ export default function App() {
   useEffect(() => {
     fetchBuses();
     // Initial fetch for nearby stops
-    axios.get(`http://localhost:3000/api/stops/nearby?lat=${selectedLocation.lat}&lng=${selectedLocation.lng}`)
+    axios.get(`/api/stops/nearby?lat=${selectedLocation.lat}&lng=${selectedLocation.lng}`)
       .then(res => setNearbyStops(res.data))
       .catch(() => {});
 
@@ -243,10 +245,10 @@ export default function App() {
   const toggleSimulation = async () => {
     try {
       if (isSimulationRunning) {
-        await axios.post('http://localhost:3000/api/simulation/pause');
+        await axios.post('/api/simulation/pause');
         setIsSimulationRunning(false);
       } else {
-        await axios.post('http://localhost:3000/api/simulation/start');
+        await axios.post('/api/simulation/start');
         setIsSimulationRunning(true);
       }
     } catch (err) {
@@ -256,7 +258,7 @@ export default function App() {
 
   const resetSimulation = async () => {
     try {
-      const res = await axios.post('http://localhost:3000/api/simulation/reset');
+      const res = await axios.post('/api/simulation/reset');
       if (res.data.success) {
         setBuses(res.data.buses);
       }
@@ -301,7 +303,7 @@ export default function App() {
   const findBusesNearMe = () => {
     setIsSearching(true);
     const searchCoord = userLocation || [selectedLocation.lat, selectedLocation.lng];
-    axios.post('http://localhost:3000/api/buses/nearby', { latitude: searchCoord[0], longitude: searchCoord[1], radius: 3 })
+    axios.post('/api/buses/nearby', { latitude: searchCoord[0], longitude: searchCoord[1], radius: 3 })
       .then(res => {
         setNearbyResults(res.data);
         setIsSearching(false);
