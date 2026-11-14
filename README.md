@@ -21,6 +21,19 @@
 
 > ⚠️ **Prototype notice:** All bus movement is **simulated**. No real BMTC data feed is used.
 
+## Deployment
+
+**Hosted Backend API:**  
+https://bus-near-me-1.onrender.com/
+
+The backend API is deployed on Render.
+
+**Local development addresses:**
+- Frontend: `http://localhost:5173`
+- Backend: `http://localhost:3000`
+
+> Note: The Render URL is the hosted backend API, not the complete frontend website.
+
 ## Features
 
 - 🗺️ **Live map** powered by Leaflet + OpenStreetMap with animated bus markers
@@ -34,16 +47,16 @@
 
 ## Tech Stack
 
-| Layer    | Technology                                                      |
-| -------- | --------------------------------------------------------------- |
+| Layer | Technology |
+|---|---|
 | Frontend | React 19, TypeScript, Vite, Tailwind CSS 4, Framer Motion, Axios |
-| Map      | Leaflet, React-Leaflet, OpenStreetMap tiles                     |
-| Backend  | Node.js, Express 5, TypeScript, ts-node, nodemon                |
-| Tooling  | Oxlint, dotenv, CORS                                            |
+| Map | Leaflet, React-Leaflet, OpenStreetMap tiles |
+| Backend | Node.js, Express 5, TypeScript, ts-node, nodemon |
+| Tooling | Oxlint, dotenv, CORS |
 
 ## Project Structure
 
-```
+```text
 Bus-near-me/
 ├── backend/
 │   ├── src/
@@ -71,7 +84,7 @@ Bus-near-me/
 - **Node.js** 20 or newer
 - **npm** 10 or newer
 
-### 1. Clone
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/<your-username>/Bus-near-me.git
@@ -92,7 +105,7 @@ The API runs at **http://localhost:3000**.
 
 ### 3. Start the frontend
 
-In a second terminal:
+Open a second terminal:
 
 ```bash
 cd backend/frontend
@@ -112,42 +125,42 @@ PORT=3000
 
 ## Available Scripts
 
-**Backend** (`backend/`)
+### Backend (`backend/`)
 
-| Script        | Description                     |
-| ------------- | ------------------------------- |
+| Script | Description |
+|---|---|
 | `npm run dev` | Start with nodemon (hot reload) |
-| `npm start`   | Start with ts-node              |
+| `npm start` | Start with ts-node (single run) |
 
-**Frontend** (`backend/frontend/`)
+### Frontend (`backend/frontend/`)
 
-| Script            | Description                       |
-| ----------------- | --------------------------------- |
-| `npm run dev`     | Vite dev server with HMR          |
-| `npm run build`   | Type-check and build for production |
-| `npm run preview` | Preview the production build      |
-| `npm run lint`    | Lint with Oxlint                  |
+| Script | Description |
+|---|---|
+| `npm run dev` | Vite dev server with HMR |
+| `npm run build` | Type-check and build for production |
+| `npm run preview` | Preview the production build |
+| `npm run lint` | Lint with Oxlint |
 
 ## API Reference
 
 Base URL: `http://localhost:3000`
 
-| Method | Endpoint                 | Description                                        |
-| ------ | ------------------------ | -------------------------------------------------- |
-| GET    | `/`                      | API index and endpoint list                        |
-| GET    | `/api/health`            | Health check                                       |
-| GET    | `/api/locations`         | Predefined Bengaluru localities                    |
-| POST   | `/api/location`          | Set simulation centre and regenerate fleet         |
-| GET    | `/api/buses`             | All simulated buses                                |
-| GET    | `/api/buses/:id`         | Single bus by ID                                   |
-| POST   | `/api/buses/nearby`      | Nearby stops and buses for a coordinate            |
-| GET    | `/api/stops`             | All bus stops                                      |
-| GET    | `/api/stops/nearby`      | 10 closest stops (`?lat=&lng=`)                    |
-| POST   | `/api/simulation/start`  | Resume simulation                                  |
-| POST   | `/api/simulation/pause`  | Pause simulation                                   |
-| POST   | `/api/simulation/reset`  | Regenerate fleet around current centre             |
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/` | API index and endpoint list |
+| GET | `/api/health` | Health check |
+| GET | `/api/locations` | Predefined Bengaluru localities |
+| POST | `/api/location` | Set simulation centre and regenerate fleet |
+| GET | `/api/buses` | All simulated buses |
+| GET | `/api/buses/:id` | Single bus by ID |
+| POST | `/api/buses/nearby` | Nearby stops and buses for a coordinate |
+| GET | `/api/stops` | All bus stops |
+| GET | `/api/stops/nearby` | 10 closest stops (`?lat=&lng=`) |
+| POST | `/api/simulation/start` | Resume simulation |
+| POST | `/api/simulation/pause` | Pause simulation |
+| POST | `/api/simulation/reset` | Regenerate fleet around current centre |
 
-### Example: nearby buses
+### Example: Nearby buses
 
 ```bash
 curl -X POST http://localhost:3000/api/buses/nearby \
@@ -155,12 +168,23 @@ curl -X POST http://localhost:3000/api/buses/nearby \
   -d '{"latitude": 12.9767, "longitude": 77.5713, "radius": 3}'
 ```
 
-```jsonc
+Example response:
+
+```json
 {
   "success": true,
-  "userLocation": { "latitude": 12.9767, "longitude": 77.5713 },
+  "userLocation": {
+    "latitude": 12.9767,
+    "longitude": 77.5713
+  },
   "nearbyStops": [
-    { "id": "STOP009", "name": "Kempegowda Bus Station", "latitude": 12.9767, "longitude": 77.5713, "distanceKm": 0 }
+    {
+      "id": "STOP009",
+      "name": "Kempegowda Bus Station",
+      "latitude": 12.9767,
+      "longitude": 77.5713,
+      "distanceKm": 0
+    }
   ],
   "nearbyBuses": [
     {
@@ -178,7 +202,7 @@ curl -X POST http://localhost:3000/api/buses/nearby \
 
 ### Bus model
 
-```ts
+```typescript
 interface Bus {
   id: string;
   routeNumber: string;
@@ -199,8 +223,8 @@ interface Bus {
 
 ## How It Works
 
-1. On startup (and whenever the location changes) the server generates **15 simulated buses** scattered around the chosen centre.
-2. Every **3 seconds** a timer nudges each bus's position, speed, and ETA with small random deltas.
+1. On startup (and whenever the location changes), the server generates **15 simulated buses** scattered around the chosen centre.
+2. Every **3 seconds**, a timer nudges each bus's position, speed, and ETA with small random deltas.
 3. The frontend polls `/api/buses` every 3 seconds and re-renders markers.
 4. Distances use the **Haversine formula**; nearby-bus ETA is a simple distance-based estimate.
 
@@ -210,26 +234,26 @@ interface Bus {
 - The frontend has the API URL hardcoded to `http://localhost:3000`.
 - Polling is used instead of WebSockets.
 - No automated tests yet.
+- Bus positions, speeds, and ETAs are simulated and should not be treated as actual BMTC tracking information.
 
 ## Roadmap
 
-- [ ] Move API base URL to a `VITE_API_URL` env variable
+- [ ] Move API base URL to a `VITE_API_URL` environment variable
 - [ ] Drive simulation from real `routes.ts` paths and stops
 - [ ] WebSocket / SSE for push updates
 - [ ] Integrate real GTFS or BMTC data
 - [ ] Unit tests (Vitest, Jest) and CI via GitHub Actions
 - [ ] Docker Compose for one-command setup
-- [ ] Deploy (Vercel + Render)
+- [ ] Deploy frontend (Vercel or Netlify) and backend (Render)
 
 ## Contributing
 
-1. Fork the repo
+1. Fork the repository.
 2. Create a branch: `git checkout -b feature/your-feature`
 3. Commit: `git commit -m "feat: add your feature"`
 4. Push: `git push origin feature/your-feature`
-5. Open a Pull Request
+5. Open a Pull Request.
 
 ## License
 
 Distributed under the ISC License.
-
