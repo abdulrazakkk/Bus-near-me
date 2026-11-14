@@ -233,8 +233,3 @@ interface Bus {
 
 Distributed under the ISC License.
 
----
-
-<div align="center">
-Built with ❤️ for Bengaluru commuters
-</div>
